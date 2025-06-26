@@ -6,7 +6,7 @@ SECRET_KEY = 'django-insecure-!h-97(!wu8d)#fgd!#d$*%t#gix*4@&q*^ts9%@x9&q0b5caap
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['<your_server_ip>', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['38.180.37.83', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -19,6 +19,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'drf_spectacular',
+    'fcm_django',  # Added for FCMDevice model
+    'django_celery_results',
     'books',
     'stationery',
     'promotions',
@@ -131,3 +133,10 @@ FCM_DJANGO_SETTINGS = {
     "DELETE_INACTIVE_DEVICES": True,
     "UPDATE_ON_DUPLICATE_REG_ID": True,
 }
+
+CELERY_BROKER_URL = 'redis://<your_redis_ip>:6379/0'
+CELERY_RESULT_BACKEND = 'redis://<your_redis_ip>:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
