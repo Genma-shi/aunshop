@@ -6,7 +6,7 @@ SECRET_KEY = 'django-insecure-!h-97(!wu8d)#fgd!#d$*%t#gix*4@&q*^ts9%@x9&q0b5caap
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['<your_server_ip>', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -58,8 +58,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'aunshop',
+        'USER': 'genma',
+        'PASSWORD': 'dastan150506',
+        'HOST': '<your_server_ip>',
+        'PORT': '5432',
     }
 }
 
@@ -117,12 +121,12 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_URL = 'static/'  
+STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 FCM_DJANGO_SETTINGS = {
-    "CREDENTIALS": BASE_DIR / "config/aun-shop-firebase-adminsdk-fbsvc-f0f62faa03.json",
+    "CREDENTIALS": BASE_DIR / "config/firebase_service_account.json",
     "ONE_DEVICE_PER_USER": False,
     "DELETE_INACTIVE_DEVICES": True,
     "UPDATE_ON_DUPLICATE_REG_ID": True,
