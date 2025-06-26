@@ -19,6 +19,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'drf_spectacular',
+    'fcm_django',  # Added for FCMDevice model
+    'django_celery_results',
     'books',
     'stationery',
     'promotions',
@@ -131,3 +133,13 @@ FCM_DJANGO_SETTINGS = {
     "DELETE_INACTIVE_DEVICES": True,
     "UPDATE_ON_DUPLICATE_REG_ID": True,
 }
+<<<<<<< HEAD
+=======
+
+CELERY_BROKER_URL = 'redis://<your_redis_ip>:6379/0'
+CELERY_RESULT_BACKEND = 'redis://<your_redis_ip>:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+>>>>>>> 89eba96144e20b267db9114082b2588f609a2739
