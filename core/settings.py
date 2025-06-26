@@ -6,7 +6,7 @@ SECRET_KEY = 'django-insecure-!h-97(!wu8d)#fgd!#d$*%t#gix*4@&q*^ts9%@x9&q0b5caap
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['38.180.37.83', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [ 'www.genmashi.ru' , 'genmashi.ru']
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -26,6 +26,11 @@ INSTALLED_APPS = [
     'promotions',
     'users',
     'cart',
+]
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
 MIDDLEWARE = [
@@ -61,11 +66,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'aunshop',
+        'NAME': 'genma_db',
         'USER': 'genma',
         'PASSWORD': 'dastan150506',
-        'HOST': '<your_server_ip>',
-        'PORT': '5432',
+        'HOST': 'localhost',
+        'PORT': '5433',
     }
 }
 
@@ -124,6 +129,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -133,8 +139,6 @@ FCM_DJANGO_SETTINGS = {
     "DELETE_INACTIVE_DEVICES": True,
     "UPDATE_ON_DUPLICATE_REG_ID": True,
 }
-<<<<<<< HEAD
-=======
 
 CELERY_BROKER_URL = 'redis://<your_redis_ip>:6379/0'
 CELERY_RESULT_BACKEND = 'redis://<your_redis_ip>:6379/0'
@@ -142,4 +146,3 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
->>>>>>> 89eba96144e20b267db9114082b2588f609a2739
