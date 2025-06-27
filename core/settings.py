@@ -6,7 +6,7 @@ SECRET_KEY = 'django-insecure-!h-97(!wu8d)#fgd!#d$*%t#gix*4@&q*^ts9%@x9&q0b5caap
 
 DEBUG = True
 
-ALLOWED_HOSTS = [ 'www.genmashi.ru' , 'genmashi.ru']
+# ALLOWED_HOSTS = [ 'www.genmashi.ru' , 'genmashi.ru']
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -66,11 +66,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'genma_db',
+        'NAME': 'aunshop',
         'USER': 'genma',
         'PASSWORD': 'dastan150506',
         'HOST': 'localhost',
-        'PORT': '5433',
+        'PORT': '5432',
     }
 }
 
@@ -122,7 +122,7 @@ SPECTACULAR_SETTINGS = {
 
 LANGUAGE_CODE = 'ru-ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Bishkek'
 
 USE_I18N = True
 

@@ -11,15 +11,18 @@ class VariationSerializer(serializers.ModelSerializer):
         model = Variation
         fields = ['name', 'value', 'price_modifier']
 
-class StationerySerializer(serializers.ModelSerializer):
-    images = StationeryImageSerializer(many=True)
-    variations = VariationSerializer(many=True)
-    category = serializers.StringRelatedField()
-    class Meta:
-        model = Stationery
-        fields = '__all__'
-
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ['id', 'name']
+
+class StationerySerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(), source='category', write_only=True
+    )
+
+    class Meta:
+        model = Stationery
+        fields = ['id', 'title', 'category', 'category_id', 'price', 'description', 'created_at']
+
