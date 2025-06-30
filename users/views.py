@@ -11,6 +11,8 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
 class LoginView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -18,8 +20,12 @@ class LoginView(APIView):
         password = serializer.validated_data['password']
         user = authenticate(request, username=login_field, password=password)
         if user:
-            login(request, user)
-            return Response(UserSerializer(user).data)
+            login(request, user)  # Для сессий, если нужно
+            token, created = Token.objects.get_or_create(user=user)  # Создаем или получаем токен
+            return Response({
+                'token': token.key,
+                'user': UserSerializer(user).data
+            })
         return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 class LogoutView(APIView):
