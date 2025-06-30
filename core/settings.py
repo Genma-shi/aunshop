@@ -6,7 +6,7 @@ SECRET_KEY = 'django-insecure-!h-97(!wu8d)#fgd!#d$*%t#gix*4@&q*^ts9%@x9&q0b5caap
 
 DEBUG = True
 
-# ALLOWED_HOSTS = [ 'www.genmashi.ru' , 'genmashi.ru']
+ALLOWED_HOSTS = [ 'www.genmashi.ru' , 'genmashi.ru']
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -53,7 +53,7 @@ SPECTACULAR_SETTINGS = {
             'Bearer': {
                 'type': 'http',
                 'scheme': 'bearer',
-                'bearerFormat': 'Token',  # Для TokenAuthentication
+                'bearerFormat': 'Token', 
             },
         },
     ],
@@ -112,7 +112,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',  # Добавляем TokenAuthentication
+        'rest_framework.authentication.TokenAuthentication',  
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],

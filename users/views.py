@@ -20,8 +20,8 @@ class LoginView(APIView):
         password = serializer.validated_data['password']
         user = authenticate(request, username=login_field, password=password)
         if user:
-            login(request, user)  # Для сессий, если нужно
-            token, created = Token.objects.get_or_create(user=user)  # Создаем или получаем токен
+            login(request, user) 
+            token, created = Token.objects.get_or_create(user=user) 
             return Response({
                 'token': token.key,
                 'user': UserSerializer(user).data
