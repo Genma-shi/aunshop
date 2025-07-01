@@ -5,6 +5,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from stationery.views import StationeryViewSet
 from books.views import BookViewSet
 from promotions.views import PromotionListView, PromotionDetailView
+from .views import GlobalSearchView
 
 router = DefaultRouter()
 
@@ -19,6 +20,7 @@ urlpatterns = [
     path('api/promotions/', include('promotions.urls')),
     path('api/cart/', include('cart.urls')),
 
+    path('search/', GlobalSearchView.as_view(), name='global-search'),
     # Swagger / OpenAPI
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
