@@ -2,13 +2,16 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate, login, logout
-from .models import CustomUser
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer , FCMTokenSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.authtoken.models import Token
+
+from .models import CustomUser
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, FCMTokenSerializer
 
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = RegisterSerializer
+    permission_classes = [AllowAny]
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -18,10 +21,14 @@ class LoginView(APIView):
         serializer.is_valid(raise_exception=True)
         login_field = serializer.validated_data['login']
         password = serializer.validated_data['password']
+
+        # Аутентификация по username — если хочешь по телефону, добавь кастомный backend
         user = authenticate(request, username=login_field, password=password)
+
         if user:
-            login(request, user) 
-            token, created = Token.objects.get_or_create(user=user) 
+            # Не обязательно login(), если используешь токены
+            login(request, user)
+            token, created = Token.objects.get_or_create(user=user)
             return Response({
                 'token': token.key,
                 'user': UserSerializer(user).data
@@ -29,6 +36,8 @@ class LoginView(APIView):
         return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         logout(request)
         return Response({"detail": "Logged out successfully"})
@@ -36,9 +45,10 @@ class LogoutView(APIView):
 class ProfileView(generics.RetrieveUpdateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
     def get_object(self):
         return self.request.user
-
 
 class FCMTokenView(APIView):
     permission_classes = [IsAuthenticated]
