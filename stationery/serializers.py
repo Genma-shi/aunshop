@@ -16,13 +16,30 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'name']
 
+class StationeryListSerializer(serializers.ModelSerializer):
+    first_image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Stationery
+        fields = ['id', 'title', 'price', 'description', 'first_image']
+
+    def get_first_image(self, obj):
+        first_image = obj.images.first()
+        return StationeryImageSerializer(first_image).data if first_image else None
+
 class StationerySerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(), source='category', write_only=True
     )
+    images = StationeryImageSerializer(many=True, read_only=True)
+    variations = VariationSerializer(many=True, read_only=True)
+    first_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Stationery
-        fields = ['id', 'title', 'category', 'category_id', 'price', 'description', 'created_at']
+        fields = ['id', 'title', 'category', 'category_id', 'price', 'brand', 'description', 'images', 'variations', 'first_image', 'created_at']
 
+    def get_first_image(self, obj):
+        first_image = obj.images.first()
+        return StationeryImageSerializer(first_image).data if first_image else None
