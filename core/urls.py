@@ -7,8 +7,6 @@ from books.views import BookViewSet
 from promotions.views import PromotionListView, PromotionDetailView
 
 router = DefaultRouter()
-router.register(r'books', BookViewSet)
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -16,10 +14,10 @@ urlpatterns = [
     # API маршруты
     path('api/', include(router.urls)),
     path('api/', include('users.urls')),
-
+    path('api/books/', include('books.urls')),
     path('api/stationery/', include('stationery.urls')),
-    
     path('api/promotions/', include('promotions.urls')),
+    path('api/cart/', include('cart.urls')),
 
     # Swagger / OpenAPI
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

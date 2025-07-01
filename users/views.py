@@ -14,10 +14,11 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
 class LoginView(APIView):
+    serializer_class = LoginSerializer
     permission_classes = [AllowAny]
 
     def post(self, request):
-        serializer = LoginSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)  # можно так
         serializer.is_valid(raise_exception=True)
         login_field = serializer.validated_data['login']
         password = serializer.validated_data['password']
@@ -36,6 +37,7 @@ class LoginView(APIView):
         return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 class LogoutView(APIView):
+    serializer_class = None
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -51,6 +53,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 class FCMTokenView(APIView):
+    serializer_class = FCMTokenSerializer
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
