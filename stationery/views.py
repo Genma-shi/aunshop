@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics
 from .models import Stationery
 from .serializers import StationerySerializer, StationeryListSerializer
 
@@ -16,3 +17,10 @@ class StationeryViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return StationeryListSerializer
         return StationerySerializer
+
+class RecentStationeryListView(generics.ListAPIView):
+    serializer_class = StationerySerializer
+
+    def get_queryset(self):
+        # Возвращаем последние 5 добавленных канцтоваров (можно поменять лимит)
+        return Stationery.objects.order_by('-created_at')
