@@ -15,6 +15,7 @@ class CartListView(generics.ListAPIView):
         return CartItem.objects.filter(user=user) | CartItem.objects.filter(session_key=session_key)
 
 class CartAddView(APIView):
+    serializer_class = CartItemSerializer
     def post(self, request):
         item_type = request.data.get('item_type')
         item_id = request.data.get('item_id')
@@ -40,6 +41,7 @@ class CartAddView(APIView):
         return Response(CartItemSerializer(cart_item).data)
 
 class CartRemoveView(APIView):
+    serializer_class = CartItemSerializer
     def delete(self, request, pk):
         user = request.user if request.user.is_authenticated else None
         session_key = request.session.session_key if not user else None

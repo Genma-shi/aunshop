@@ -4,6 +4,7 @@ from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from .models import Stationery
 from .serializers import StationerySerializer, StationeryListSerializer
+from rest_framework import generics
 
 class StationeryViewSet(viewsets.ModelViewSet):
     queryset = Stationery.objects.all()
@@ -16,3 +17,9 @@ class StationeryViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return StationeryListSerializer
         return StationerySerializer
+
+class RecentStationeryListView(generics.ListAPIView):
+    serializer_class = StationerySerializer
+
+    def get_queryset(self):
+        return Stationery.objects.order_by('-created_at')[:10]
