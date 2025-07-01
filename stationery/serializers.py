@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Stationery, Category, Variation, StationeryImage
+from drf_spectacular.utils import extend_schema_field
 
 class StationeryImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,7 +23,8 @@ class StationeryListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stationery
         fields = ['id', 'title', 'price', 'description', 'first_image']
-
+        
+    @extend_schema_field(str)
     def get_first_image(self, obj):
         first_image = obj.images.first()
         return StationeryImageSerializer(first_image).data if first_image else None
@@ -39,7 +41,8 @@ class StationerySerializer(serializers.ModelSerializer):
     class Meta:
         model = Stationery
         fields = ['id', 'title', 'category', 'category_id', 'price', 'brand', 'description', 'images', 'variations', 'first_image', 'created_at']
-
+    
+    @extend_schema_field(str)
     def get_first_image(self, obj):
         first_image = obj.images.first()
         return StationeryImageSerializer(first_image).data if first_image else None
