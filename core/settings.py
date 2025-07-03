@@ -6,7 +6,7 @@ SECRET_KEY = 'django-insecure-!h-97(!wu8d)#fgd!#d$*%t#gix*4@&q*^ts9%@x9&q0b5caap
 
 DEBUG = True
 
-# ALLOWED_HOSTS = [ 'www.genmashi.ru' , 'genmashi.ru']
+ALLOWED_HOSTS = ['genmashi.ru', 'www.genmashi.ru']
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework.authtoken',
     'rest_framework',
     'django_filters',
     'drf_spectacular',
@@ -42,6 +43,21 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Bookstore API',
+    'DESCRIPTION': 'API for managing books, stationery, promotions, users, and cart',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': True,
+    'SECURITY': [
+        {
+            'Bearer': {
+                'type': 'http',
+                'scheme': 'bearer',
+                'bearerFormat': 'Token', 
+            },
+        },
+    ],
+}
 
 ROOT_URLCONF = 'core.urls'
 
@@ -95,6 +111,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',

@@ -3,18 +3,20 @@ from .models import CustomUser
 
 class RegisterSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True)
+
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'phone_number', 'email', 'password', 'password2']
         extra_kwargs = {'password': {'write_only': True}}
+
     def validate(self, data):
         if data['password'] != data['password2']:
-            raise serializers.ValidationError("Passwords do not match")
+            raise serializers.ValidationError("Пароли не совпадают")
         return data
+
     def create(self, validated_data):
         validated_data.pop('password2')
-        user = CustomUser.objects.create_user(**validated_data)
-        return user
+        return CustomUser.objects.create_user(**validated_data)
 
 class LoginSerializer(serializers.Serializer):
     phone_number = serializers.CharField()
@@ -24,7 +26,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'first_name', 'last_name', 'phone_number', 'email']
-
 
 class FCMTokenSerializer(serializers.Serializer):
     fcm_token = serializers.CharField(max_length=255)
