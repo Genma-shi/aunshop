@@ -6,13 +6,14 @@ from stationery.views import StationeryViewSet
 from books.views import BookViewSet
 from promotions.views import PromotionListView, PromotionDetailView
 from .views import GlobalSearchView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 router = DefaultRouter()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     
-    # API ��������
+    # API
     path('api/', include(router.urls)),
     path('api/', include('users.urls')),
     path('api/books/', include('books.urls')),
@@ -21,7 +22,7 @@ urlpatterns = [
     path('api/cart/', include('cart.urls')),
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh')
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     path('search/', GlobalSearchView.as_view(), name='global-search'),
     # Swagger / OpenAPI

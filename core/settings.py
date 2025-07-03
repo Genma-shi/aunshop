@@ -6,7 +6,7 @@ SECRET_KEY = 'django-insecure-!h-97(!wu8d)#fgd!#d$*%t#gix*4@&q*^ts9%@x9&q0b5caap
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['genmashi.ru', 'www.genmashi.ru']
+# ALLOWED_HOSTS = ['genmashi.ru', 'www.genmashi.ru']
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -138,6 +138,11 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': True,
 }
+
+AUTHENTICATION_BACKENDS = [
+    'core.backends.PhoneBackend',  # путь к твоему бекенду
+    'django.contrib.auth.backends.ModelBackend',  # чтобы не потерять стандартный по email
+]
 
 LANGUAGE_CODE = 'ru-ru'
 
