@@ -37,8 +37,9 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True, verbose_name=_("Электронная почта"), blank=True , null=True)
     fcm_token = models.CharField(max_length=255, verbose_name=_("FCM-токен"), blank=True, null=True)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['phone_number', 'first_name', 'last_name']
+    USERNAME_FIELD = 'phone_number'
+    REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
+
 
     objects = CustomUserManager()
 
