@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterView, LoginView, LogoutView, ProfileView , FCMTokenView
+from .views import RegisterView, LoginView, LogoutView, ProfileView , FCMTokenView , PhoneTokenObtainPairView
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
@@ -7,4 +7,6 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('fcm-token/', FCMTokenView.as_view(), name='fcm-token'),
+
+    path('token/', PhoneTokenObtainPairView.as_view(), name='token_obtain_pair'),
 ]

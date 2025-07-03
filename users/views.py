@@ -5,22 +5,38 @@ from django.contrib.auth import authenticate, login, logout
 from .models import CustomUser
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer , FCMTokenSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.contrib.auth import get_user_model
 
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = RegisterSerializer
 
+
+User = get_user_model()
+
 class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        login_field = serializer.validated_data['login']
+
+        phone = serializer.validated_data['phone_number']
         password = serializer.validated_data['password']
-        user = authenticate(request, username=login_field, password=password)
-        if user:
-            login(request, user)
-            return Response(UserSerializer(user).data)
-        return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            user = User.objects.get(phone_number=phone)
+        except User.DoesNotExist:
+            return Response({"detail": "Пользователь не найден"}, status=404)
+
+        if not user.check_password(password):
+            return Response({"detail": "Неверный пароль"}, status=400)
+
+        # Вход и возврат JWT-токенов
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        })
+
 
 class LogoutView(APIView):
     def post(self, request):
@@ -44,3 +60,9 @@ class FCMTokenView(APIView):
             request.user.save()
             return Response({"message": "FCM token updated"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .jwt_serializers import PhoneTokenObtainPairSerializer
+
+class PhoneTokenObtainPairView(TokenObtainPairView):
+    serializer_class = PhoneTokenObtainPairSerializer
