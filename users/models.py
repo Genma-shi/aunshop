@@ -16,7 +16,7 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, phone_number, password, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_staff', True) 
         extra_fields.setdefault('is_superuser', True)
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser РґРѕР»Р¶РµРЅ РёРјРµС‚СЊ is_staff=True.')
@@ -26,11 +26,16 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractUser):
     username = None
-    first_name = models.CharField(max_length=50, verbose_name=_("РРјСЏ"), blank=False)
-    last_name = models.CharField(max_length=50, verbose_name=_("Р¤Р°РјРёР»РёСЏ"), blank=False)
-    phone_number = models.CharField(max_length=15, unique=True, verbose_name=_("РќРѕРјРµСЂ С‚РµР»РµС„РѕРЅР°"), blank=False, help_text=_("Р’РІРµРґРёС‚Рµ РЅРѕРјРµСЂ С‚РµР»РµС„РѕРЅР° РІ РјРµР¶РґСѓРЅР°СЂРѕРґРЅРѕРј С„РѕСЂРјР°С‚Рµ, РЅР°РїСЂРёРјРµСЂ +996700333111"))
-    email = models.EmailField(unique=True, verbose_name=_("Р­Р»РµРєС‚СЂРѕРЅРЅР°СЏ РїРѕС‡С‚Р°"), blank=False)
-    fcm_token = models.CharField(max_length=255, verbose_name=_("FCM-С‚РѕРєРµРЅ"), blank=True, null=True)
+    first_name = models.CharField(max_length=50, verbose_name=_("Имя"), blank=False)
+    last_name = models.CharField(max_length=50, verbose_name=_("Фамилия"), blank=False)
+    phone_number = models.CharField(
+        max_length=15, unique=True,
+        verbose_name=_("Номер телефона"),
+        blank=False,
+        help_text=_("Введите номер телефона в международном формате, например +996700333111")
+    )
+    email = models.EmailField(unique=True, verbose_name=_("Электронная почта"), blank=True , null=True)
+    fcm_token = models.CharField(max_length=255, verbose_name=_("FCM-токен"), blank=True, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['phone_number', 'first_name', 'last_name']

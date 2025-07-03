@@ -3,14 +3,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.permissions import AllowAny, IsAuthenticated
-<<<<<<< HEAD
-from django.contrib.auth import get_user_model
-=======
 from rest_framework.authtoken.models import Token
+from django.contrib.auth import get_user_model
 
 from .models import CustomUser
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, FCMTokenSerializer
->>>>>>> a6b22cc36e6a48a50326020dc8a5a56b9e66a076
 
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
@@ -32,7 +29,8 @@ class LoginView(APIView):
         password = serializer.validated_data['password']
 
         # Аутентификация по username — если хочешь по телефону, добавь кастомный backend
-        user = authenticate(request, username=login_field, password=password)
+        user = authenticate(request, username=phone, password=password)
+
 
         if user:
             # Не обязательно login(), если используешь токены
@@ -71,13 +69,9 @@ class FCMTokenView(APIView):
             request.user.save()
             return Response({"message": "FCM token updated"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-<<<<<<< HEAD
-    
+
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .jwt_serializers import PhoneTokenObtainPairSerializer
 
 class PhoneTokenObtainPairView(TokenObtainPairView):
     serializer_class = PhoneTokenObtainPairSerializer
-=======
-
->>>>>>> a6b22cc36e6a48a50326020dc8a5a56b9e66a076

@@ -62,10 +62,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['first_name', 'last_name', 'phone_number', 'email', 'password', 'password2']
         extra_kwargs = {'password': {'write_only': True}}
 
-    def validate(self, data):
-        if data['password'] != data['password2']:
-            raise serializers.ValidationError("Пароли не совпадают")
-        return data
+    def validate(self, attrs):
+        # заменим username на phone_number
+        self.user = self.context['request'].user  # тут неверно!
+        attrs['username'] = attrs.get('phone_number')
+        return super().validate(attrs)
 
     def create(self, validated_data):
         password = validated_data.pop('password')

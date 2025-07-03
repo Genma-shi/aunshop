@@ -26,3 +26,4 @@ class GlobalSearchView(APIView):
             "stationery": StationeryListSerializer(stationeries, many=True).data,
             "promotions": PromotionSerializer(promotions, many=True).data,
         })
+ 
