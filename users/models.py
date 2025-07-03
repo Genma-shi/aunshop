@@ -1,38 +1,45 @@
+from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+class CustomUserManager(BaseUserManager):
+    use_in_migrations = True
+
+    def create_user(self, email, phone_number, password=None, **extra_fields):
+        if not email and not phone_number:
+            raise ValueError('Email РёР»Рё РЅРѕРјРµСЂ С‚РµР»РµС„РѕРЅР° РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ СѓРєР°Р·Р°РЅС‹')
+        email = self.normalize_email(email) if email else None
+        user = self.model(email=email, phone_number=phone_number, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, phone_number, password, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser РґРѕР»Р¶РµРЅ РёРјРµС‚СЊ is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser РґРѕР»Р¶РµРЅ РёРјРµС‚СЊ is_superuser=True.')
+        return self.create_user(email, phone_number, password, **extra_fields)
 
 class CustomUser(AbstractUser):
-    USERNAME_FIELD = 'phone_number'
-    REQUIRED_FIELDS = ['username']
-    first_name = models.CharField(
-        max_length=50,
-        verbose_name="Имя"
-    )
-    last_name = models.CharField(
-        max_length=50,
-        verbose_name="Фамилия"
-    )
-    phone_number = models.CharField(
-        max_length=15,
-        unique=True,
-        verbose_name="Номер телефона"
-    )
-    email = models.EmailField(
-        unique=True,
-        blank=True,  # ← Сделали необязательным
-        null=True,   # ← Сделали необязательным
-        verbose_name="Электронная почта"
-    )
-    fcm_token = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        verbose_name="FCM-токен"
-    )
+    username = None
+    first_name = models.CharField(max_length=50, verbose_name=_("РРјСЏ"), blank=False)
+    last_name = models.CharField(max_length=50, verbose_name=_("Р¤Р°РјРёР»РёСЏ"), blank=False)
+    phone_number = models.CharField(max_length=15, unique=True, verbose_name=_("РќРѕРјРµСЂ С‚РµР»РµС„РѕРЅР°"), blank=False, help_text=_("Р’РІРµРґРёС‚Рµ РЅРѕРјРµСЂ С‚РµР»РµС„РѕРЅР° РІ РјРµР¶РґСѓРЅР°СЂРѕРґРЅРѕРј С„РѕСЂРјР°С‚Рµ, РЅР°РїСЂРёРјРµСЂ +996700333111"))
+    email = models.EmailField(unique=True, verbose_name=_("Р­Р»РµРєС‚СЂРѕРЅРЅР°СЏ РїРѕС‡С‚Р°"), blank=False)
+    fcm_token = models.CharField(max_length=255, verbose_name=_("FCM-С‚РѕРєРµРЅ"), blank=True, null=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['phone_number', 'first_name', 'last_name']
+
+    objects = CustomUserManager()
 
     class Meta:
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
+        verbose_name = _("РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ")
+        verbose_name_plural = _("РџРѕР»СЊР·РѕРІР°С‚РµР»Рё")
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.first_name} {self.last_name} ({self.email})"

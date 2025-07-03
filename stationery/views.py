@@ -1,23 +1,26 @@
-from rest_framework import generics, filters , viewsets
+from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Stationery
-from .serializers import StationerySerializer
 from rest_framework.filters import SearchFilter
-
-class StationeryListView(generics.ListAPIView):
-    queryset = Stationery.objects.all()
-    serializer_class = StationerySerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['category']
-    search_fields = ['title', 'brand']
-
-class StationeryDetailView(generics.RetrieveAPIView):
-    queryset = Stationery.objects.all()
-    serializer_class = StationerySerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics
+from .models import Stationery
+from .serializers import StationerySerializer, StationeryListSerializer
+from rest_framework import generics
 
 class StationeryViewSet(viewsets.ModelViewSet):
     queryset = Stationery.objects.all()
-    serializer_class = StationerySerializer
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['category']  # Фильтрация по категории
-    search_fields = ['title']  # Поиск по названию
+    filterset_fields = ['category']
+    search_fields = ['title']
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return StationeryListSerializer
+        return StationerySerializer
+
+class RecentStationeryListView(generics.ListAPIView):
+    serializer_class = StationerySerializer
+
+    def get_queryset(self):
+        return Stationery.objects.order_by('-created_at')[:10]
