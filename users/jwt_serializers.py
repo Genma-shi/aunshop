@@ -1,10 +1,16 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class PhoneTokenObtainPairSerializer(TokenObtainPairSerializer):
     phone_number = serializers.CharField(write_only=True)
 
-    username_field = 'phone_number'  # ВАЖНО: сообщаем базовому классу, что логин — phone_number
+    class Meta:
+        model = User
+        fields = ['phone_number', 'password']
+        extra_kwargs = {'password': {'write_only': True}}
 
     @classmethod
     def get_token(cls, user):
@@ -14,12 +20,7 @@ class PhoneTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
     def validate(self, attrs):
-        phone_number = attrs.get('phone_number')
-        if not phone_number:
-            raise serializers.ValidationError('Phone number is required')
-
-        # Подставляем phone_number как username_field
-        attrs[self.username_field] = phone_number
-        # attrs.pop('phone_number', None)
-
+        print("attrs before:", attrs)
+        attrs['username'] = attrs['phone_number']  # ��������� username ��� ��������������
+        print("attrs after:", attrs)
         return super().validate(attrs)

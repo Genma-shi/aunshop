@@ -1,4 +1,7 @@
 from pathlib import Path
+import os
+import firebase_admin
+from firebase_admin import credentials
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -6,7 +9,10 @@ SECRET_KEY = 'django-insecure-!h-97(!wu8d)#fgd!#d$*%t#gix*4@&q*^ts9%@x9&q0b5caap
 
 DEBUG = True
 
-# ALLOWED_HOSTS = ['genmashi.ru', 'www.genmashi.ru']
+# ALLOWED_HOSTS = ['genmashi.ru', 'www.genmashi.ru' , '38.180.37.83']
+
+cred = credentials.Certificate("config/firebase.json") 
+firebase_admin.initialize_app(cred)
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -16,11 +22,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework.authtoken',
     'rest_framework',
+    'rest_framework_simplejwt',
     'django_filters',
     'drf_spectacular',
-    'fcm_django',  # Added for FCMDevice model
+    'fcm_django',
     'django_celery_results',
     'books',
     'stationery',
@@ -28,6 +34,25 @@ INSTALLED_APPS = [
     'users',
     'cart',
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'django-error.log'),
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -43,21 +68,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'Bookstore API',
-    'DESCRIPTION': 'API for managing books, stationery, promotions, users, and cart',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': True,
-    'SECURITY': [
-        {
-            'Bearer': {
-                'type': 'http',
-                'scheme': 'bearer',
-                'bearerFormat': 'Token', 
-            },
-        },
-    ],
-}
 
 ROOT_URLCONF = 'core.urls'
 
@@ -114,8 +124,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -124,25 +132,36 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-JAZZMIN_SETTINGS = {
-    'site_title': 'Bookstore Admin',
-    'site_header': 'Bookstore',
-    'site_brand': 'Bookstore',
-    'welcome_sign': 'Welcome to Bookstore Admin',
-    'show_ui_builder': True,
-}
-
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Bookstore API',
     'DESCRIPTION': 'API for managing books, stationery, promotions, users, and cart',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': True,
+    'SECURITY': [
+        {
+            'Bearer': {
+                'type': 'http',
+                'scheme': 'bearer',
+                'bearerFormat': 'JWT',
+            },
+        },
+    ],
 }
 
 AUTHENTICATION_BACKENDS = [
-    'core.backends.PhoneBackend',  # путь к твоему бекенду
-    'django.contrib.auth.backends.ModelBackend',  # чтобы не потерять стандартный по email
+    'core.authentication.PhoneBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'UPDATE_LAST_LOGIN': False,
+}
 
 LANGUAGE_CODE = 'ru-ru'
 
@@ -158,15 +177,23 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 FCM_DJANGO_SETTINGS = {
-    "CREDENTIALS": BASE_DIR / "config/firebase_service_account.json",
-    "ONE_DEVICE_PER_USER": False,
-    "DELETE_INACTIVE_DEVICES": True,
-    "UPDATE_ON_DUPLICATE_REG_ID": True,
+    'CREDENTIALS': BASE_DIR / 'config/firebase.json',
+    'ONE_DEVICE_PER_USER': False,
+    'DELETE_INACTIVE_DEVICES': True,
+    'UPDATE_ON_DUPLICATE_REG_ID': True,
 }
 
-CELERY_BROKER_URL = 'redis://<your_redis_ip>:6379/0'
-CELERY_RESULT_BACKEND = 'redis://<your_redis_ip>:6379/0'
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+
+JAZZMIN_SETTINGS = {
+    'site_title': 'Bookstore Admin',
+    'site_header': 'Bookstore',
+    'site_brand': 'Bookstore',
+    'welcome_sign': 'Welcome to Bookstore Admin',
+    'show_ui_builder': True,
+}
