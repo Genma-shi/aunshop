@@ -19,7 +19,11 @@ urlpatterns = [
     path('api/stationery/', include('stationery.urls')),
     path('api/promotions/', include('promotions.urls')),
     path('api/cart/', include('cart.urls')),
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> d27e09a2c0be8f10faa03f7cadeb3f330d7b5baa
 
     path('search/', GlobalSearchView.as_view(), name='global-search'),
     # Swagger / OpenAPI

@@ -1,5 +1,7 @@
 from pathlib import Path
 import os
+import firebase_admin
+from firebase_admin import credentials
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -8,6 +10,9 @@ SECRET_KEY = 'django-insecure-!h-97(!wu8d)#fgd!#d$*%t#gix*4@&q*^ts9%@x9&q0b5caap
 DEBUG = True
 
 ALLOWED_HOSTS = ['genmashi.ru', 'www.genmashi.ru' , '38.180.37.83']
+
+cred = credentials.Certificate("config/firebase.json") 
+firebase_admin.initialize_app(cred)
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -172,7 +177,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 FCM_DJANGO_SETTINGS = {
-    'CREDENTIALS': BASE_DIR / 'config/firebase_service_account.json',
+    'CREDENTIALS': BASE_DIR / 'config/firebase.json',
     'ONE_DEVICE_PER_USER': False,
     'DELETE_INACTIVE_DEVICES': True,
     'UPDATE_ON_DUPLICATE_REG_ID': True,
