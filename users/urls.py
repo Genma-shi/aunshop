@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterView, LoginView, LogoutView, ProfileView, FCMTokenView, PhoneTokenObtainPairView
+from .views import *
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
@@ -10,4 +10,10 @@ urlpatterns = [
     path('fcm-token/', FCMTokenView.as_view(), name='fcm-token'),
     path('token/', PhoneTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+    path('email/send-code/', SendEmailConfirmationCodeView.as_view()),
+    path('email/confirm/', ConfirmEmailView.as_view()),
+
+    path('password/send-code/', SendPasswordResetCodeView.as_view()),
+    path('password/reset/', ResetPasswordView.as_view()),
 ]
