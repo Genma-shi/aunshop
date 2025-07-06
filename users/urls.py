@@ -14,6 +14,8 @@ urlpatterns = [
     path('email/send-code/', SendEmailConfirmationCodeView.as_view()),
     path('email/confirm/', ConfirmEmailView.as_view()),
 
+    path('notifications/settings/', NotificationSettingView.as_view(), name='notification-settings'),
+
     path('password/send-code/', SendPasswordResetCodeView.as_view()),
     path('password/reset/', ResetPasswordView.as_view()),
 ]

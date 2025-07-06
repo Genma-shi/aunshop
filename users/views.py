@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics, status , permissions
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -145,3 +145,18 @@ class ResetPasswordView(APIView):
         user.save()
         confirmation.delete()
         return Response({"message": "Пароль успешно сброшен"})
+
+class NotificationSettingView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        return Response({'notifications_enabled': request.user.notifications_enabled})
+
+    def post(self, request):
+        serializer = NotificationSettingSerializer(data=request.data)
+        if serializer.is_valid():
+            request.user.notifications_enabled = serializer.validated_data['notifications_enabled']
+            request.user.save()
+            return Response({'notifications_enabled': request.user.notifications_enabled})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

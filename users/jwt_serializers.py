@@ -21,10 +21,6 @@ class PhoneTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
         print("attrs before:", attrs)
-<<<<<<< HEAD
-        attrs['username'] = attrs['phone_number']  # подменяем username для аутентификации
-=======
-        attrs['username'] = attrs['phone_number']  # пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ username пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
->>>>>>> d27e09a2c0be8f10faa03f7cadeb3f330d7b5baa
+        attrs['username'] = attrs['phone_number']  
         print("attrs after:", attrs)
         return super().validate(attrs)

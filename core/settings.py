@@ -16,6 +16,7 @@ firebase_admin.initialize_app(cred)
 
 INSTALLED_APPS = [
     'jazzmin',
+    'core.apps.CoreConfig', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

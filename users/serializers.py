@@ -63,6 +63,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
+class NotificationSettingSerializer(serializers.Serializer):
+    notifications_enabled = serializers.BooleanField()
+
 class LoginSerializer(serializers.Serializer):
     phone_number = serializers.CharField()
     password = serializers.CharField(write_only=True)

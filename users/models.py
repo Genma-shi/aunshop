@@ -41,6 +41,7 @@ class CustomUser(AbstractUser):
     )
     email = models.EmailField(unique=True, verbose_name=_("Email address"), blank=True, null=True)
     fcm_token = models.CharField(max_length=255, verbose_name=_("FCM token"), blank=True, null=True)
+    notifications_enabled = models.BooleanField(default=True)
 
     USERNAME_FIELD = 'phone_number'  # Use phone number for authentication
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name']

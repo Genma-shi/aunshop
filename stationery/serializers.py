@@ -23,11 +23,14 @@ class StationeryListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stationery
         fields = ['id', 'title', 'price', 'description', 'first_image']
-        
+    
     @extend_schema_field(str)
     def get_first_image(self, obj):
         first_image = obj.images.first()
-        return StationeryImageSerializer(first_image).data if first_image else None
+        if first_image:
+            request = self.context.get('request')
+            return request.build_absolute_uri(first_image.image.url) if request else first_image.image.url
+        return None
 
 class StationerySerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
@@ -40,9 +43,15 @@ class StationerySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Stationery
-        fields = ['id', 'title', 'category', 'category_id', 'price', 'brand', 'description', 'images', 'variations', 'first_image', 'created_at']
-    
+        fields = [
+            'id', 'title', 'category', 'category_id', 'price', 'brand',
+            'description', 'images', 'variations', 'first_image', 'created_at'
+        ]
+
     @extend_schema_field(str)
     def get_first_image(self, obj):
         first_image = obj.images.first()
-        return StationeryImageSerializer(first_image).data if first_image else None
+        if first_image:
+            request = self.context.get('request')
+            return request.build_absolute_uri(first_image.image.url) if request else first_image.image.url
+        return None

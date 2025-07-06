@@ -2,10 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from stationery.views import StationeryViewSet
-from books.views import BookViewSet
-from promotions.views import PromotionListView, PromotionDetailView
-from .views import GlobalSearchView
+from .views import GlobalSearchView , PageContentDetailView
 
 router = DefaultRouter()
 
@@ -19,6 +16,8 @@ urlpatterns = [
     path('api/stationery/', include('stationery.urls')),
     path('api/promotions/', include('promotions.urls')),
     path('api/cart/', include('cart.urls')),
+
+    path('api/page-content/<str:key>/', PageContentDetailView.as_view(), name='page-content-detail'),
 
     path('search/', GlobalSearchView.as_view(), name='global-search'),
     # Swagger / OpenAPI
