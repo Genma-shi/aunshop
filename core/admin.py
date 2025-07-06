@@ -9,7 +9,7 @@ class PageContentAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Если это редактирование (instance есть и pk установлен), то делаем поле key readonly (запрет)
+        # Р•СЃР»Рё СЌС‚Рѕ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ (instance РµСЃС‚СЊ Рё pk СѓСЃС‚Р°РЅРѕРІР»РµРЅ), С‚Рѕ РґРµР»Р°РµРј РїРѕР»Рµ key readonly (Р·Р°РїСЂРµС‚)
         if self.instance and self.instance.pk:
             self.fields['key'].disabled = True
 
@@ -20,3 +20,13 @@ class PageContentAdmin(admin.ModelAdmin):
     list_display = ('key', 'title')
     list_editable = ('title',)
     search_fields = ('key', 'title')
+
+from django.contrib import admin
+from django.contrib.auth.models import User, Group
+from fcm_django.models import FCMDevice
+
+for model in (User, Group, FCMDevice):
+    try:
+        admin.site.unregister(model)
+    except admin.sites.NotRegistered:
+        pass

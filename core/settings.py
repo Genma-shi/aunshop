@@ -28,7 +28,6 @@ INSTALLED_APPS = [
     'django_filters',
     'drf_spectacular',
     'fcm_django',
-    'django_celery_results',
     'books',
     'stationery',
     'promotions',

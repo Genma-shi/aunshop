@@ -1,12 +1,18 @@
 from django.contrib import admin
 from .models import Stationery, Category, Variation, StationeryImage
 
+class StationeryImageInline(admin.TabularInline):
+    model = StationeryImage
+    extra = 1
+
 @admin.register(Stationery)
 class StationeryAdmin(admin.ModelAdmin):
     list_display = ('title', 'price', 'brand', 'category')
     list_filter = ('category',)
     search_fields = ('title', 'brand')
-    filter_horizontal = ('images', 'variations')
+    filter_horizontal = ('variations',)
+    inlines = [StationeryImageInline]
+
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -17,7 +23,3 @@ class CategoryAdmin(admin.ModelAdmin):
 class VariationAdmin(admin.ModelAdmin):
     list_display = ('name', 'value', 'price_modifier')
     search_fields = ('name', 'value')
-
-@admin.register(StationeryImage)
-class StationeryImageAdmin(admin.ModelAdmin):
-    list_display = ('image',)

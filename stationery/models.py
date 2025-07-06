@@ -25,7 +25,6 @@ class Variation(models.Model):
 class Stationery(models.Model):
     title = models.CharField(max_length=200, verbose_name="Название товара")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
-    images = models.ManyToManyField('StationeryImage', verbose_name="Изображения")
     brand = models.CharField(max_length=100, verbose_name="Бренд")
     description = models.TextField(verbose_name="Описание")
     variations = models.ManyToManyField(Variation, verbose_name="Вариации")
@@ -40,6 +39,12 @@ class Stationery(models.Model):
         return self.title
 
 class StationeryImage(models.Model):
+    stationery = models.ForeignKey(  
+        Stationery,
+        on_delete=models.CASCADE,
+        related_name='images',
+        verbose_name="Товар"
+    )
     image = models.ImageField(upload_to='stationery/', verbose_name="Изображение")
 
     class Meta:
