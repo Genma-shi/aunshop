@@ -1,17 +1,23 @@
-from pathlib import Path
 import os
+from pathlib import Path
+from datetime import timedelta
+from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials
 
+# Загружаем переменные из .env
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-!h-97(!wu8d)#fgd!#d$*%t#gix*4@&q*^ts9%@x9&q0b5caap'
+# Чтение переменных
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
-DEBUG = True
-
-ALLOWED_HOSTS = ['genmashi.ru', 'www.genmashi.ru' , '38.180.37.83']
-
-cred = credentials.Certificate("config/firebase.json") 
+# Firebase init
+cred_path = os.getenv('FIREBASE_PATH')
+cred = credentials.Certificate(cred_path)
 firebase_admin.initialize_app(cred)
 
 INSTALLED_APPS = [
@@ -93,33 +99,30 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'aunshop',
-        'USER': 'genma',
-        'PASSWORD': 'dastan150506',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
@@ -154,8 +157,6 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-from datetime import timedelta
-
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=180),
@@ -165,20 +166,12 @@ SIMPLE_JWT = {
 }
 
 LANGUAGE_CODE = 'ru-ru'
-
 TIME_ZONE = 'Asia/Bishkek'
-
 USE_I18N = True
-
 USE_TZ = True
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 FCM_DJANGO_SETTINGS = {
-    'CREDENTIALS': BASE_DIR / 'config/firebase.json',
+    'CREDENTIALS': cred_path,
     'ONE_DEVICE_PER_USER': False,
     'DELETE_INACTIVE_DEVICES': True,
     'UPDATE_ON_DUPLICATE_REG_ID': True,
@@ -203,9 +196,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'genmashi150505@gmail.com'  # твой Gmail
-EMAIL_HOST_PASSWORD = 'nslb meij yipd rtnx'  # пароль приложения
-EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_SSL = False
 EMAIL_TIMEOUT = 10
-
