@@ -17,5 +17,6 @@ urlpatterns = [
     path('notifications/settings/', NotificationSettingView.as_view(), name='notification-settings'),
 
     path('password/send-code/', SendPasswordResetCodeView.as_view()),
-    path('password/reset/', ResetPasswordView.as_view()),
+    path('password/check-reset-code/', CheckPasswordResetCodeView.as_view()),
+    path('password/set-new-password/', SetNewPasswordView.as_view()),
 ]

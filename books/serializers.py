@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Book
+from .models import Book ,  Subject
 
 class BookSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
@@ -13,3 +13,8 @@ class BookSerializer(serializers.ModelSerializer):
         if obj.image:
             return request.build_absolute_uri(obj.image.url) if request else obj.image.url
         return None
+
+class SubjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subject
+        fields = ['id', 'name']

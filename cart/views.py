@@ -6,6 +6,7 @@ from .serializers import CartItemSerializer
 from books.models import Book
 from stationery.models import Stationery
 from promotions.models import Promotion
+from rest_framework.permissions import AllowAny
 
 class CartListView(generics.ListAPIView):
     serializer_class = CartItemSerializer
@@ -50,3 +51,42 @@ class CartRemoveView(APIView):
             cart_item.delete()
             return Response({"detail": "Item removed"})
         return Response({"detail": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+class CartIncreaseView(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request, pk):
+        user = request.user if request.user.is_authenticated else None
+        session_key = request.session.session_key or request.session.create() or request.session.session_key
+
+        cart_item = CartItem.objects.filter(id=pk).filter(user=user) | CartItem.objects.filter(id=pk).filter(session_key=session_key)
+        cart_item = cart_item.first()
+
+        if not cart_item:
+            return Response({"detail": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        cart_item.quantity += 1
+        cart_item.save()
+        return Response({"detail": "Quantity increased", "quantity": cart_item.quantity})
+
+
+class CartDecreaseView(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request, pk):
+        user = request.user if request.user.is_authenticated else None
+        session_key = request.session.session_key or request.session.create() or request.session.session_key
+
+        cart_item = CartItem.objects.filter(id=pk).filter(user=user) | CartItem.objects.filter(id=pk).filter(session_key=session_key)
+        cart_item = cart_item.first()
+
+        if not cart_item:
+            return Response({"detail": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        cart_item.quantity -= 1
+        if cart_item.quantity < 1:
+            cart_item.delete()
+            return Response({"detail": "Item removed due to zero quantity"})
+
+        cart_item.save()
+        return Response({"detail": "Quantity decreased", "quantity": cart_item.quantity})

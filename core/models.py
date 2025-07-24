@@ -17,3 +17,16 @@ class PageContent(models.Model):
     
     def __str__(self):
         return self.get_key_display()
+
+class ContactPhoneNumber(models.Model):
+    phone_number = models.CharField(
+        max_length=20,
+        verbose_name='Номер телефона для WhatsApp'
+    )
+
+    class Meta:
+        verbose_name = 'Номер для WhatsApp'
+        verbose_name_plural = 'Номера для WhatsApp'
+
+    def __str__(self):
+        return self.phone_number

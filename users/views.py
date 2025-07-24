@@ -5,12 +5,14 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import CustomUser
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, FCMTokenSerializer
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, FCMTokenSerializer , NotificationSettingSerializer , PasswordResetCodeSerializer, CheckResetCodeSerializer, SetNewPasswordSerializer
 from .jwt_serializers import PhoneTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.core.mail import send_mail
 from .models import EmailConfirmationCode
-import random
+import random 
+from django.core.mail import send_mail, BadHeaderError
+from smtplib import SMTPException  # <-- правильно
 
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
@@ -68,83 +70,154 @@ class PhoneTokenObtainPairView(TokenObtainPairView):
     serializer_class = PhoneTokenObtainPairSerializer
 
 class SendEmailConfirmationCodeView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         email = request.data.get("email")
         if not email:
-            return Response({"detail": "Email is required"}, status=400)
+            return Response({"detail": "Email обязателен"}, status=400)
 
         code = str(random.randint(100000, 999999))
-        EmailConfirmationCode.objects.create(user=request.user, email=email, code=code)
+
+        # Удаляем старые коды с этим email
+        EmailConfirmationCode.objects.filter(email=email).delete()
+
+        # Создаём новый код
+        EmailConfirmationCode.objects.create(email=email, code=code, is_confirmed=False)
 
         send_mail(
-            'Подтверждение Email',
-            f'Ваш код подтверждения: {code}',
+            'Код подтверждения email',
+            f'Ваш код: {code}',
             'genmashi150505@gmail.com',
-            [email],
-            fail_silently=False,
+            [email]
         )
-        return Response({"message": "Код отправлен на email"})
+
+        return Response({"message": "Код отправлен"})
 
 class ConfirmEmailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         email = request.data.get("email")
         code = request.data.get("code")
 
-        confirmation = EmailConfirmationCode.objects.filter(user=request.user, email=email, code=code).first()
-        if confirmation:
-            confirmation.is_confirmed = True
-            confirmation.save()
+        confirmation = EmailConfirmationCode.objects.filter(
+            email=email, code=code
+        ).first()
 
-            request.user.email = email
-            request.user.save()
-            return Response({"message": "Email подтверждён"})
-        return Response({"error": "Неверный код"}, status=400)
+        if not confirmation:
+            return Response({"error": "Неверный код"}, status=400)
+
+        confirmation.is_confirmed = True
+        confirmation.save()
+
+        return Response({"message": "Email подтверждён"})
 
 class SendPasswordResetCodeView(APIView):
-    def post(self, request):
-        email = request.data.get("email")
-        if not email:
-            return Response({"detail": "Email is required"}, status=400)
+    permission_classes = [AllowAny]
+    serializer_class = PasswordResetCodeSerializer
 
+    def post(self, request):
         try:
-            user = CustomUser.objects.get(email=email)
-        except CustomUser.DoesNotExist:
-            return Response({"detail": "Пользователь с таким email не найден"}, status=404)
+            print("📥 Данные запроса:", request.data)
+ 
+            serializer = self.serializer_class(data=request.data)
+            if not serializer.is_valid():
+                print("❌ Ошибка валидации:", serializer.errors)
+                return Response(serializer.errors, status=400)
 
-        code = str(random.randint(100000, 999999))
-        EmailConfirmationCode.objects.create(user=user, email=email, code=code)
+            email = serializer.validated_data['email']
+            print("📧 Email:", email)
 
-        send_mail(
-            'Сброс пароля',
-            f'Ваш код сброса пароля: {code}',
-            'genmashi150505@gmail.com',
-            [email],
-            fail_silently=False,
-        )
-        return Response({"message": "Код отправлен на email"})
-class ResetPasswordView(APIView):
+            try:
+                user = CustomUser.objects.get(email=email)
+            except CustomUser.DoesNotExist:
+                return Response({"detail": "Пользователь с таким email не найден"}, status=404)
+
+            code = str(random.randint(100000, 999999))
+            EmailConfirmationCode.objects.filter(email=email).delete()
+            EmailConfirmationCode.objects.create(email=email, code=code, is_confirmed=False)
+
+            try:
+                send_mail(
+                    'Сброс пароля',
+                    f'Ваш код сброса пароля: {code}',
+                    'genmashi150505@gmail.com',
+                    [email],
+                    fail_silently=False,
+                )
+            except Exception as e:
+                print("❌ Ошибка при отправке письма:", str(e))
+                return Response({"error": "Ошибка при отправке письма"}, status=500)
+
+            print("✅ Код отправлен на почту")
+            return Response({"message": "Код отправлен на email"})
+
+        except Exception as e:
+            print("🔥 Общая ошибка:", str(e))
+            import traceback
+            print(traceback.format_exc())
+            return Response({"error": str(e)}, status=500)
+
+# Этап 1: проверка кода
+class CheckPasswordResetCodeView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = CheckResetCodeSerializer
+
     def post(self, request):
-        email = request.data.get("email")
-        code = request.data.get("code")
-        password1 = request.data.get("password")
-        password2 = request.data.get("password2")
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+        code = serializer.validated_data['code']
+
+        confirmation = EmailConfirmationCode.objects.filter(
+            email=email,
+            code=code,
+            is_confirmed=False
+        ).first()
+
+        if not confirmation:
+            return Response({"error": "Неверный код"}, status=400)
+
+        confirmation.is_confirmed = True
+        confirmation.save()
+
+        return Response({"message": "Код подтверждён. Теперь можно задать новый пароль."})
+
+# Этап 2: установка нового пароля
+class SetNewPasswordView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = SetNewPasswordSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data['email']
+        password1 = serializer.validated_data['password']
+        password2 = serializer.validated_data['password2']
 
         if password1 != password2:
             return Response({"error": "Пароли не совпадают"}, status=400)
 
-        confirmation = EmailConfirmationCode.objects.filter(email=email, code=code).first()
-        if not confirmation:
-            return Response({"error": "Неверный код"}, status=400)
+        confirmation = EmailConfirmationCode.objects.filter(
+            email=email,
+            is_confirmed=True
+        ).order_by('-created_at').first()
 
-        user = confirmation.user
+        if not confirmation:
+            return Response({"error": "Сначала подтвердите код"}, status=400)
+
+        try:
+            user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "Пользователь не найден"}, status=404)
+
         user.set_password(password1)
         user.save()
         confirmation.delete()
-        return Response({"message": "Пароль успешно сброшен"})
+
+        return Response({"message": "Пароль успешно установлен"})
 
 class NotificationSettingView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -159,4 +232,3 @@ class NotificationSettingView(APIView):
             request.user.save()
             return Response({'notifications_enabled': request.user.notifications_enabled})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-

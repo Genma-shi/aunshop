@@ -63,6 +63,21 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
+class PasswordResetCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class CheckResetCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField(max_length=6)
+
+
+class SetNewPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
+
+
 class NotificationSettingSerializer(serializers.Serializer):
     notifications_enabled = serializers.BooleanField()
 
