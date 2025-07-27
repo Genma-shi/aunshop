@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import CustomUser
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, FCMTokenSerializer , NotificationSettingSerializer , PasswordResetCodeSerializer, CheckResetCodeSerializer, SetNewPasswordSerializer
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, FCMTokenSerializer , NotificationSettingSerializer , PasswordResetCodeSerializer, CheckResetCodeSerializer, SetNewPasswordSerializer , AddressSerializer	
 from .jwt_serializers import PhoneTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.core.mail import send_mail
@@ -218,6 +218,22 @@ class SetNewPasswordView(APIView):
         confirmation.delete()
 
         return Response({"message": "Пароль успешно установлен"})
+
+class AddressUpdateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = AddressSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            request.user.address = serializer.validated_data['address']
+            request.user.save()
+            return Response({"message": "Адрес успешно обновлён"})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request):
+        return Response({"address": request.user.address or ""})
+
 
 class NotificationSettingView(APIView):
     permission_classes = [permissions.IsAuthenticated]
