@@ -5,24 +5,25 @@ from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials
 
-# Загружаем переменные из .env
+# Загрузка .env переменных
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Чтение переменных
+# Базовые настройки
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
-# Firebase init
+# Firebase
 cred_path = os.getenv('FIREBASE_PATH')
 cred = credentials.Certificate(cred_path)
 firebase_admin.initialize_app(cred)
 
+# Приложения
 INSTALLED_APPS = [
     'jazzmin',
-    'core.apps.CoreConfig', 
+    'core.apps.CoreConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'rest_framework.authtoken',
@@ -40,8 +41,10 @@ INSTALLED_APPS = [
     'promotions',
     'users',
     'cart',
+    'storages',  # добавляем для работы с бакетом
 ]
 
+# Логирование
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -61,11 +64,32 @@ LOGGING = {
     },
 }
 
+# Хранилище файлов (в бакете DigitalOcean Spaces)
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL')
+AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME')
+
+# Отключить временные подписи для прямой отдачи
+AWS_QUERYSTRING_AUTH = False
+
+# URL для медиафайлов
+MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/"
+MEDIA_ROOT = None  # не используется при бакете
+
+# Статика
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -76,8 +100,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# URL и WSGI
 ROOT_URLCONF = 'core.urls'
+WSGI_APPLICATION = 'core.wsgi.application'
 
+# Шаблоны
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -94,8 +121,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
-
+# База данных
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -116,14 +142,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# JWT + DRF
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10,
@@ -165,11 +186,13 @@ SIMPLE_JWT = {
     'UPDATE_LAST_LOGIN': False,
 }
 
+# Язык и время
 LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'Asia/Bishkek'
 USE_I18N = True
 USE_TZ = True
 
+# Firebase push-уведомления
 FCM_DJANGO_SETTINGS = {
     'CREDENTIALS': cred_path,
     'ONE_DEVICE_PER_USER': False,
@@ -177,6 +200,7 @@ FCM_DJANGO_SETTINGS = {
     'UPDATE_ON_DUPLICATE_REG_ID': True,
 }
 
+# Celery
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
@@ -184,6 +208,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
+# Jazzmin
 JAZZMIN_SETTINGS = {
     'site_title': 'Bookstore Admin',
     'site_header': 'Bookstore',
@@ -192,19 +217,7 @@ JAZZMIN_SETTINGS = {
     'show_ui_builder': True,
 }
 
-# Хранилище медиафайлов через DigitalOcean 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL')
-AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME')
-
-AWS_QUERYSTRING_AUTH = False
-
-MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/"
-
+# Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
