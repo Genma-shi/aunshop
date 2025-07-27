@@ -88,7 +88,10 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'first_name', 'last_name', 'phone_number', 'email']
+        fields = ['id', 'first_name', 'last_name', 'phone_number', 'email' , 'address']
+
+class AddressSerializer(serializers.Serializer):
+    address = serializers.CharField(required=True, allow_blank=False)
 
 class FCMTokenSerializer(serializers.Serializer):
     fcm_token = serializers.CharField(max_length=255)
