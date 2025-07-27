@@ -1,0 +1,21 @@
+FROM alpine:3.19.1
+
+ENV MAIN_DIR /opt/services/backup_service
+ENV TZ Asia/Bishkek
+ENV TARGETARCH go-cron_0.0.5_linux_amd64.tar.gz
+
+WORKDIR ${MAIN_DIR}
+
+RUN apk update \
+    && apk add postgresql-client --no-cache \
+    && apk add curl --no-cache \
+    && apk add s3cmd --no-cache \
+    && apk add tzdata --no-cache \
+    && curl -L https://github.com/ivoronin/go-cron/releases/download/v0.0.5/${TARGETARCH} -O \
+    && tar xvf ${TARGETARCH} \
+    && rm ${TARGETARCH} \
+    && mv go-cron /usr/local/bin/go-cron \
+    && chmod u+x /usr/local/bin/go-cron \
+    && rm -rf /var/cache/apk/*
+
+CMD ["sh", "service/install.sh"]
