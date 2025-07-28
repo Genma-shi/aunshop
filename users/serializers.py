@@ -39,19 +39,23 @@ class PhoneTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True)
+    address = serializers.CharField(required=False, allow_blank=True)  # добавлено поле address
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'phone_number', 'email', 'password', 'password2']
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ['first_name', 'last_name', 'phone_number', 'email', 'password', 'password2', 'address']
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'email': {'required': False},
+        }
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({"password": "Passwords must match"})
+            raise serializers.ValidationError({"password": "Пароли должны совпадать"})
         if CustomUser.objects.filter(phone_number=attrs['phone_number']).exists():
-            raise serializers.ValidationError({"phone_number": "Phone number already exists"})
+            raise serializers.ValidationError({"phone_number": "Номер телефона уже зарегистрирован"})
         if attrs.get('email') and CustomUser.objects.filter(email=attrs['email']).exists():
-            raise serializers.ValidationError({"email": "Email already exists"})
+            raise serializers.ValidationError({"email": "Email уже зарегистрирован"})
         return attrs
 
     def create(self, validated_data):
@@ -62,7 +66,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             **validated_data
         )
         return user
-
 class PasswordResetCodeSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
