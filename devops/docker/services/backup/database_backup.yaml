@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  backup:
+    tty: true
+    build:
+      context: ../../../dockerfiles
+      dockerfile: backup
+    ports: []
+    volumes:
+      - .:/opt/services/backup_service
+      - ../../../environments/.s3cfg:/root/.s3cfg:ro
+    env_file:
+      - ../../../environments/.backup
+    networks:
+     - services_default
+
+networks:
+  services_default:
+    external: true
