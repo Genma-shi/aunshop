@@ -1,0 +1,15 @@
+version: '3.3'
+
+services:
+  aunshop_nginx:
+      image: nginx:1.13-alpine
+      restart: unless-stopped
+      ports:
+        - "443:443"
+      volumes:
+        - ../nginx/conf.prod:/etc/nginx/conf.d
+        - ../../staticfiles:/opt/services/aunshop_backend/back_static
+        - ../../media:/opt/services/aunshop_backend/back_media
+        - /etc/letsencrypt:/etc/letsencrypt
+      networks:
+        - nginx_network
