@@ -22,7 +22,7 @@ class StationeryListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Stationery
-        fields = ['id', 'title', 'price', 'description', 'first_image']
+        fields = ['id', 'title', 'price', 'stock', 'description', 'first_image']
     
     @extend_schema_field(str)
     def get_first_image(self, obj):
@@ -45,7 +45,7 @@ class StationerySerializer(serializers.ModelSerializer):
         model = Stationery
         fields = [
             'id', 'title', 'category', 'category_id', 'price', 'brand',
-            'description', 'images', 'variations', 'first_image', 'created_at'
+            'description', 'images', 'variations', 'first_image', 'created_at' , 'stock'
         ]
 
     @extend_schema_field(str)
