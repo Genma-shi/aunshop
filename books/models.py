@@ -39,6 +39,7 @@ class Book(models.Model):
     language = models.CharField('Язык', max_length=2, choices=LANGUAGE_CHOICES)
     image = models.ImageField('Изображение', upload_to='books/')
     subject = models.ForeignKey(Subject, verbose_name='Предмет', on_delete=models.CASCADE)
+    stock = models.PositiveIntegerField('Количество на складе', default=0)  # Новое поле
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
 
     class Meta:
