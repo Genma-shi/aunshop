@@ -29,6 +29,7 @@ class Stationery(models.Model):
     description = models.TextField(verbose_name="Описание")
     variations = models.ManyToManyField(Variation, verbose_name="Вариации")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name="Категория")
+    stock = models.PositiveIntegerField(verbose_name="Количество на складе", default=0)  # Новое поле
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     class Meta:
