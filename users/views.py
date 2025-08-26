@@ -234,6 +234,13 @@ class AddressUpdateView(APIView):
     def get(self, request):
         return Response({"address": request.user.address or ""})
 
+class DeleteAccountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return Response({"message": "Аккаунт успешно удалён"}, status=200)
 
 class NotificationSettingView(APIView):
     permission_classes = [permissions.IsAuthenticated]
