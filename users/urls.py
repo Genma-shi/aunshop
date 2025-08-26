@@ -16,6 +16,8 @@ urlpatterns = [
 
     path('address/', AddressUpdateView.as_view(), name='update-address'),	
 
+    path('account/delete/', DeleteAccountView.as_view(), name='delete-account'),
+    
     path('notifications/settings/', NotificationSettingView.as_view(), name='notification-settings'),
 
     path('password/send-code/', SendPasswordResetCodeView.as_view()),
